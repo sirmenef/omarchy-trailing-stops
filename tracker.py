@@ -66,13 +66,29 @@ def quote_url(symbol):
     return ticker, exchange, f"https://www.google.com/finance/quote/{ticker}:{exchange}"
 
 
-def fetch_price(symbol):
-    """Returns (price, previous close), scraped from Google Finance. The quote page embeds
-    ["SNDK","NASDAQ"],"SanDisk Corp",0,"USD",[price, change, pct, ...],null,prev_close."""
+def fetch_page(symbol):
     ticker, exchange, url = quote_url(symbol)
     req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0 (X11; Linux x86_64)"})
     with urllib.request.urlopen(req, timeout=15) as r:
-        html = r.read().decode("utf-8", "replace")
+        return ticker, exchange, r.read().decode("utf-8", "replace")
+
+
+def fetch_history(symbol):
+    """The last month of daily closes as [(YYYY-MM-DD, close, volume)], oldest first, from the same page.
+    The daily series is the block ["MU","NASDAQ"],"/m/…","USD",[[[1],[ rows ]]] (intraday ones start
+    [[[1,[date…), each row [[y,m,d,hour,…],[close,change,pct,…],volume]."""
+    ticker, exchange, html = fetch_page(symbol)
+    block = re.search(rf'\["{re.escape(ticker)}","{re.escape(exchange)}"\],"[^"]*","[A-Z]+",\[\[\[1\],(\[.*?\])\]\]', html)
+    if not block:
+        raise ValueError("price history not found on Google Finance page")
+    return [(f"{int(y):04d}-{int(m):02d}-{int(d):02d}", float(close), int(volume)) for y, m, d, close, volume
+            in re.findall(r'\[\[(\d{4}),(\d+),(\d+),[^\]]*\]\],\[([0-9.]+),[^\]]*\],(\d+)\]', block.group(1))]
+
+
+def fetch_price(symbol):
+    """Returns (price, previous close), scraped from Google Finance. The quote page embeds
+    ["SNDK","NASDAQ"],"SanDisk Corp",0,"USD",[price, change, pct, ...],null,prev_close."""
+    ticker, exchange, html = fetch_page(symbol)
     m = re.search(rf'\["{re.escape(ticker)}","{re.escape(exchange)}"\],"[^"]*",\d+,"[A-Z]+",'
                   rf'\[([0-9.]+),[^\]]*\],null,([0-9.]+)', html)
     if not m:

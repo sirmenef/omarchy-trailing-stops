@@ -1,0 +1,9 @@
+[Unit]
+Description=Daily share roundup post (trailing-stops tickers)
+After=network-online.target
+
+[Service]
+Type=oneshot
+Environment=PYTHONDONTWRITEBYTECODE=1
+ExecStart=/usr/bin/python3 %h/.config/omarchy/plugins/io.github.sirmenef.trailing-stops/roundup.py
+TimeoutStartSec=95min

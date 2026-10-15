@@ -1,0 +1,11 @@
+[Unit]
+Description=Daily share roundup after the US close
+
+[Timer]
+# 30 min after the 16:00 New York close, whatever the UK/US clocks are doing.
+OnCalendar=Mon..Fri 16:30 America/New_York
+# Catch up after sleep; roundup.py dates the post by the NY trading session, not the wake-up time.
+Persistent=true
+
+[Install]
+WantedBy=timers.target

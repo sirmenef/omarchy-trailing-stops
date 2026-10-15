@@ -20,6 +20,10 @@ next trading day.
   alert lines use the same red and green.
 - **Notifications:** a critical desktop notification, which gets through Do Not Disturb. Clicking it
   opens the share on Google Finance. Phone push is optional (see below).
+- **Daily roundup (optional):** after the US close, an AI agent writes a short blog post on how your
+  shares behaved and why. A second agent fact-checks it before it is saved. When a Buy bounce has
+  fired, the post also judges, from the last two weeks of prices, whether it looks like a real turn or
+  a temporary rally. See [Daily roundup](#daily-roundup-optional-extra-setup).
 
 Tickers are Google Finance symbols. A bare `MU` or `SNDK` is looked up on NASDAQ. For other
 exchanges use `TICKER:EXCHANGE`, for example `BP:LON` or `WDC:NASDAQ`.
@@ -47,6 +51,7 @@ All of these come with Omarchy:
 - `python3` (standard library only)
 - `notify-send` (libnotify) for desktop alerts
 - `xdg-open` to open Google Finance when you click an alert
+- The optional daily roundup has extra requirements; see its section below
 - Network access to `www.google.com/finance` and, if you set it up, your ntfy server
 
 ## Phone notifications (optional extra setup)
@@ -76,12 +81,72 @@ instead. If your server is only reachable on a private network such as a VPN, yo
 on that network too. On iOS, instant delivery from a self-hosted server also needs `upstream-base-url`
 set; the ntfy docs explain it.
 
+## Daily roundup (optional extra setup)
+
+Each weekday, 30 minutes after the 16:00 New York close, `roundup.py` writes a post about your
+tickers:
+- a snapshot table with the day's alerts;
+- how the shares behaved over the last two weeks;
+- what moved them, with sources;
+- what can be inferred, with guesses labelled as guesses;
+- what to watch next.
+
+For each ticker whose **Buy bounce** alert has fired, the post adds a **Bounce or rally?** section. It
+looks at the last 10 sessions of daily closes and volume from Google Finance and judges whether the
+rise looks like a genuine turn, a temporary rally or too early to tell. It also says which closing
+prices would confirm or undo the bounce.
+
+How a post is made:
+- Prices come from the tracker and Google Finance only; the agents only research the news.
+- One agent writes the post, the other fact-checks every claim against its sources and the price
+  data, and the writer then accepts or rejects each finding and revises.
+- With [Claude Code](https://claude.com/claude-code) and [Codex](https://developers.openai.com/codex/cli)
+  both installed, Claude writes and Codex checks. If either is unavailable, the other fills in.
+- Every post links to review notes showing who wrote and checked it and what changed.
+
+**Requirements:**
+- At least one of the `claude` or `codex` CLIs, installed and logged in. Each run uses your plan or API
+  credit: a few minutes of agent time with web search.
+- The Python Markdown package:
+  ```bash
+  omarchy pkg add python-markdown
+  ```
+- Your tickers and prices are sent to the AI provider(s) with the request.
+
+**Set it up:** the timer ships with the plugin, but you copy it in and turn it on yourself:
+
+```bash
+cp ~/.config/omarchy/plugins/io.github.sirmenef.trailing-stops/share-roundup.{service,timer} ~/.config/systemd/user/
+systemctl --user daemon-reload
+systemctl --user enable --now share-roundup.timer
+```
+
+To write one straight away (after the US close), run
+`python3 ~/.config/omarchy/plugins/io.github.sirmenef.trailing-stops/roundup.py`.
+
+**Read the posts:** open `~/.local/share/trailing-stops/roundups/index.html` in a browser. If phone
+alerts are set up, each post is announced on your phone too, along with a failure notice if no agent
+could write it. To make tapping that notification open the post, serve the folder somewhere your phone
+can reach, for example with `tailscale serve`. Then add its address to
+`~/.config/omarchy/trailing-stops.json`:
+
+```json
+"roundup_url": "https://your-machine.your-tailnet.ts.net/roundups/"
+```
+
+Set `"roundup_dir"` in the same file to keep the posts somewhere else.
+
+**Updating:** `omarchy plugin update` updates `roundup.py` and the prompts, but not your copied timer
+files. If `share-roundup.service` or `.timer` change, copy them in again and run
+`systemctl --user daemon-reload`.
+
 ## Where things are stored
 
 | Path | What |
 |---|---|
 | `~/.config/omarchy/trailing-stops.json` | tickers, percentages, refresh interval, phone URL |
 | `~/.local/state/trailing-stops/state.json` | trailing highs and lows, and which alerts have fired |
+| `~/.local/share/trailing-stops/roundups/` | daily roundup posts and review notes (if you use them) |
 
 The plugin writes only these (plus a lock file next to `state.json`). It never touches any other configuration.
 
@@ -99,6 +164,17 @@ python3 tracker.py test            # send a test push
 ```
 
 ## Remove
+
+If you turned on the daily roundup, remove its timer first:
+
+```bash
+systemctl --user disable --now share-roundup.timer
+rm -f ~/.config/systemd/user/share-roundup.{service,timer}
+systemctl --user daemon-reload
+rm -rf ~/.local/share/trailing-stops   # deletes the posts too
+```
+
+Then remove the plugin and its settings:
 
 ```bash
 omarchy plugin remove io.github.sirmenef.trailing-stops

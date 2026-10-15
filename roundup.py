@@ -295,16 +295,29 @@ def render(path, title, body, nav):
         f.write(PAGE.format(title=html.escape(title), body=body, nav=nav))
 
 
-def rebuild_index():
-    posts = []
-    for name in sorted(os.listdir(OUT), reverse=True):
-        if re.fullmatch(r"\d{4}-\d{2}-\d{2}\.md", name):
-            with open(os.path.join(OUT, name)) as f:
-                title = f.readline().lstrip("# ").strip()
-            posts.append(f'<li><a href="{name[:-3]}.html">{html.escape(title)}</a> '
-                         f'<em>{datetime.strptime(name[:10], "%Y-%m-%d"):%a %d %b %Y}</em></li>')
-    render(os.path.join(OUT, "index.html"), "Share roundups",
-           "<h1>Share roundups</h1>\n<ul>\n" + "\n".join(posts) + "\n</ul>", "")
+def rebuild_index(root):
+    """Three lists: daily/ (the roundups), alerts/ (the dip/bounce analyses) and both on the base page."""
+    def items(folder, pattern, href):
+        out = []
+        for name in sorted(os.listdir(folder), reverse=True) if os.path.isdir(folder) else []:
+            if re.fullmatch(pattern, name):
+                with open(os.path.join(folder, name)) as f:
+                    title = f.readline().lstrip("# ").strip()
+                out.append(f'<li><a href="{href}{name[:-3]}.html">{html.escape(title)}</a> '
+                           f'<em>{datetime.strptime(name[:10], "%Y-%m-%d"):%a %d %b %Y}</em></li>')
+        return "<ul>\n" + "\n".join(out) + "\n</ul>" if out else "<p><em>None yet.</em></p>"
+    daily, alerts = r"\d{4}-\d{2}-\d{2}\.md", r"\d{4}-\d{2}-\d{2}-.+-(dip|bounce)\.md"
+    adir, home = os.path.join(root, "alerts"), '<a href="../">← share roundups</a>'
+    os.makedirs(os.path.join(root, "daily"), exist_ok=True)
+    os.makedirs(adir, exist_ok=True)
+    render(os.path.join(root, "index.html"), "Share roundups",
+           '<h1>Share roundups</h1>\n<h2><a href="daily/">Daily roundups</a></h2>\n' + items(root, daily, "")
+           + '\n<h2><a href="alerts/">Buy dip and Buy bounce analyses</a></h2>\n' + items(adir, alerts, "alerts/"),
+           "")
+    render(os.path.join(root, "daily", "index.html"), "Daily roundups",
+           "<h1>Daily roundups</h1>\n" + items(root, daily, "../"), home)
+    render(os.path.join(adir, "index.html"), "Buy dip and Buy bounce analyses",
+           "<h1>Buy dip and Buy bounce analyses</h1>\n" + items(adir, alerts, ""), home)
 
 
 def main():
@@ -338,12 +351,12 @@ def main():
         f.write(text)
     with open(os.path.join(OUT, f"{day}.review.md"), "w") as f:
         f.write(notes)
-    nav = '<a href="./">← all roundups</a>'
+    nav = '<a href="daily/">← daily roundups</a>'
     render(os.path.join(OUT, f"{day}.html"), title, to_html(text), nav)
     # nl2br keeps each finding's Problem/Evidence/Fix lines apart; posts don't get it (wrapped prose).
     render(os.path.join(OUT, f"{day}.review.html"), f"Review notes {day}", to_html(notes, "nl2br"),
            f'{nav} · <a href="{day}.html">the post</a>')
-    rebuild_index()
+    rebuild_index(OUT)
     print(f"wrote {md_path}")
     if push_url:
         moves = " · ".join(f"{s['symbol']} {s['close']:,.2f} ({s['change_pct']:+.1f}%)"

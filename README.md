@@ -25,8 +25,8 @@ next trading day.
   fired, the post also judges, from the last two weeks of prices, whether it looks like a real turn or
   a temporary rally. See [Daily roundup](#daily-roundup-optional-extra-setup).
 - **Alert analysis (optional):** a few minutes after a Buy dip or Buy bounce fires, a second phone push
-  explains it: what is pushing the price down, or whether the bounce looks like a real turn or a
-  temporary rally. It is written and fact-checked the same way. See
+  sums it up and links to a short article: what is pushing the price down, or whether the bounce looks
+  like a real turn or a temporary rally. It is written and fact-checked the same way. See
   [Alert analysis](#alert-analysis-optional).
 
 Tickers are Google Finance symbols. A bare `MU` or `SNDK` is looked up on NASDAQ. For other
@@ -128,7 +128,8 @@ systemctl --user enable --now share-roundup.timer
 To write one straight away (after the US close), run
 `python3 ~/.config/omarchy/plugins/io.github.sirmenef.trailing-stops/roundup.py`.
 
-**Read the posts:** open `~/.local/share/trailing-stops/roundups/index.html` in a browser. If phone
+**Read the posts:** open `~/.local/share/trailing-stops/roundups/index.html` in a browser. It lists both
+kinds of article; `daily/` lists only the daily roundups and `alerts/` only the alert analyses. If phone
 alerts are set up, each post is announced on your phone too, along with a failure notice if no agent
 could write it. To make tapping that notification open the post, serve the folder somewhere your phone
 can reach, for example with `tailscale serve`. Then add its address to
@@ -155,10 +156,13 @@ on, a second push follows a few minutes later:
 - **Buy bounce:** the case for a genuine turn and the case for a temporary rally (a "dead-cat bounce").
   It gives a verdict labelled as judgement and the closing prices that would confirm or undo it.
 
-The note is written, fact-checked and revised by the same Claude/Codex pair as the daily roundup.
-Tapping the push opens the full note with its sources and review notes if `roundup_url` is set (see
-above). Otherwise it opens the share on Google Finance. The notes are saved in the roundup folder under
-`alerts/`. Sell stops don't get one.
+The push carries a short summary. The full article adds why the alert fired, what is behind the move,
+the case for and against, the last two weeks and what to watch, with its sources and review notes. It
+is written, fact-checked and revised by the same Claude/Codex pair as the daily roundup.
+
+Tapping the push opens the article if `roundup_url` is set (see above). Otherwise it opens the share on
+Google Finance. The articles are saved in the roundup folder under `alerts/` and listed on its index
+page and on `alerts/`. Sell stops don't get one.
 
 **Requirements:** phone notifications set up, plus the same `claude`/`codex` CLI and `python-markdown`
 as the daily roundup. You don't need the roundup timer. Each analysis is one AI run on your plan or
@@ -178,7 +182,7 @@ If an analysis fails, the push says so. The log is `~/.local/state/trailing-stop
 |---|---|
 | `~/.config/omarchy/trailing-stops.json` | tickers, percentages, refresh interval, phone URL |
 | `~/.local/state/trailing-stops/state.json` | trailing highs and lows, and which alerts have fired |
-| `~/.local/share/trailing-stops/roundups/` | daily roundup posts, alert notes (`alerts/`) and their review notes (if you use them) |
+| `~/.local/share/trailing-stops/roundups/` | daily roundup posts, alert articles (`alerts/`) and their review notes (if you use them) |
 
 The plugin writes only these (plus a lock file next to `state.json`). It never touches any other configuration.
 

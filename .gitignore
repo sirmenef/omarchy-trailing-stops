@@ -1,0 +1,4 @@
+__pycache__/
+# The daily roundup (roundup*.py/md, share-roundup.*) is a personal add-on, kept out of the plugin.
+roundup*
+share-roundup.*

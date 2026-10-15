@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "id": "io.github.sirmenef.trailing-stops",
+  "name": "Trailing Stops",
+  "version": "1.5.3",
+  "author": "sirmenef",
+  "license": "MIT",
+  "description": "Buy-dip, buy-bounce and trailing sell-stop alerts (each with its own %) for any share on Google Finance, with a dropdown to manage tickers and optional phone push via ntfy",
+  "kinds": [
+    "service",
+    "bar-widget"
+  ],
+  "keepLoaded": true,
+  "entryPoints": {
+    "service": "Service.qml",
+    "barWidget": "BarWidget.qml"
+  },
+  "barWidget": {
+    "displayName": "Trailing Stops",
+    "description": "Icon that opens a panel of tracked shares; red when a sell stop fires, green when a buy alert fires",
+    "category": "Info",
+    "allowMultiple": false,
+    "defaultSection": "right"
+  }
+}

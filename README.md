@@ -19,7 +19,9 @@ next trading day.
   off), reset a ticker, change the refresh interval and set up phone alerts. Triggered tickers and
   alert lines use the same red and green.
 - **Notifications:** a critical desktop notification, which gets through Do Not Disturb. Clicking it
-  opens the share on Google Finance. Phone push is optional (see below).
+  opens the share on Google Finance. Phone push is optional (see below). Every title starts with the
+  alert type, for example "Buy dip · SNDK is down 3% today" or "Trailing stop loss · SNDK fell 4% from
+  its high"; the Sell stop is called the trailing stop loss in notifications.
 - **Daily roundup (optional):** after the US close, an AI agent writes a short blog post on how your
   shares behaved and why. A second agent fact-checks it before it is saved. When a Buy bounce has
   fired, the post also judges, from the last two weeks of prices, whether it looks like a real turn or

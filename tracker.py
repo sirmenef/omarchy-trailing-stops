@@ -106,6 +106,9 @@ def push(url, title, body, tags, click=None):
     urllib.request.urlopen(req, timeout=15).close()
 
 
+LABELS = {"dip": "Buy dip", "up": "Buy bounce", "down": "Trailing stop loss"}  # leads every alert title
+
+
 def notify(symbol, direction, trail, price, push_url):
     if direction == "dip":
         title = f"{symbol} is down {trail['pct']:g}% today"
@@ -116,6 +119,7 @@ def notify(symbol, direction, trail, price, push_url):
     else:
         title = f"{symbol} rose {trail['pct']:g}% off its low"
         body = f"Price {price:.2f} ≥ trigger {trail['level']:.2f}\nLow {trail['anchor']:.2f}"
+    title = f"{LABELS[direction]} · {title}"
     url = quote_url(symbol)[2]  # a click/tap on either alert opens the share's Google Finance page
     # No -a: Omarchy only lets critical alerts through Do Not Disturb when app_name is "notify-send".
     # omarchy-exec-argv is the Omarchy shell's click action (stays clickable after a shell restart).

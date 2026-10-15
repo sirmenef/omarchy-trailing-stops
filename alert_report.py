@@ -96,7 +96,9 @@ def main():
         base += "" if not base or base.endswith("/") else "/"
         body = summary.split("\n", 1)[1].replace("**", "").strip()
         body += "\n\n" + ("Tap for the full analysis. " if base else "") + credit.replace("**", "")
-        roundup.push(push_url, title, body[:3500], "mag",
+        # "SNDK dip: sector sell-off" → "Buy dip analysis · SNDK: sector sell-off"
+        heading = f"{tracker.LABELS[alert['direction']]} analysis · {symbol}: {title.split(': ', 1)[-1]}"
+        roundup.push(push_url, heading, body[:3500], "mag",
                      f"{base}alerts/{name}.html" if base else tracker.quote_url(symbol)[2])
 
 

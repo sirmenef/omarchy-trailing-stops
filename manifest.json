@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "io.github.sirmenef.trailing-stops",
   "name": "Trailing Stops",
-  "version": "1.8.0",
+  "version": "1.8.1",
   "author": "sirmenef",
   "license": "MIT",
   "description": "Buy-dip, buy-bounce and trailing sell-stop alerts (each with its own %) for any share on Google Finance, with a dropdown to manage tickers, optional phone push via ntfy and optional AI-written, fact-checked alert analysis and daily roundup",

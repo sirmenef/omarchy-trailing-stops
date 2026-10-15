@@ -129,6 +129,17 @@ def notify(symbol, direction, trail, price, push_url):
             print(f"phone push failed: {e}", file=sys.stderr)  # the desktop alert above still went out
 
 
+def analyse(symbol, direction, trail, price, prev):
+    """Buy dip / bounce follow-up: alert_report.py researches why and pushes a fact-checked note, which
+    takes minutes. Detached, with its own log instead of our stdout, so this check returns at once
+    (Service.qml waits for our stdout to close before the next check)."""
+    alert = {"symbol": symbol, "direction": direction, "price": round(price, 2), "prev_close": prev, "pct": trail["pct"],
+             "level": round(trail["level"], 2), "anchor": trail["anchor"], "triggered_at": trail["triggered_at"]}
+    with open(os.path.join(os.path.dirname(STATE), "alert-analysis.log"), "a") as log:
+        subprocess.Popen([sys.executable, os.path.join(os.path.dirname(os.path.abspath(__file__)), "alert_report.py"),
+                          json.dumps(alert)], stdin=subprocess.DEVNULL, stdout=log, stderr=log, start_new_session=True)
+
+
 def update(trail, direction, price, prev, pct):
     """WatchlistItem.UpdatePrice for one trail. Returns True on the transition to triggered."""
     sign = 1 if direction == "up" else -1
@@ -169,6 +180,8 @@ def check(state, config, overrides):
             trail = item.setdefault(direction, {"anchor": prev, "status": "active"})
             if update(trail, direction, price, prev, rule[direction]):
                 notify(symbol, direction, trail, price, config["push_url"])
+                if direction != "down" and config.get("alert_analysis") and config["push_url"]:
+                    analyse(symbol, direction, trail, price, prev)
 
 
 def fail(message):

@@ -96,6 +96,7 @@ def snapshot(day):
             if key != "dip":  # the trail's turning point: the bounce rises off it, the stop falls from it
                 alerts[-1]["lowest_seen" if key == "up" else "highest_seen"] = round(trail["anchor"], 2)
         price, prev = item.get("price"), item.get("prev_close")
+        price = round(price, 2) if price else price  # Google sometimes quotes 3 decimals; posts quote cents
         stock = {
             "symbol": symbol, "close": price, "previous_close": prev,
             "change_pct": round((price - prev) / prev * 100, 2) if price and prev else None,
@@ -187,27 +188,32 @@ def check_review(text):
     return text[m.start():]
 
 
-def check_revision(stocks):
+def check_revision(check_text):
     def check(text):
         post, sep, responses = text.partition("===RESPONSES===")
         if not sep or not responses.strip():
             raise ValueError(f"no ===RESPONSES=== section: {text[-200:]!r}")
-        return check_post(stocks)(post.strip()), responses.strip()
+        return check_text(post.strip()), responses.strip()
     return check
 
 
 def write_post(day, stocks):
-    """Writer drafts, the other provider fact-checks, the writer answers each point and revises.
-    Returns (post or "SKIP", footer credit, review notes markdown); post is None if nobody could write."""
-    with open(os.path.join(HERE, "roundup-prompt.md")) as f:
-        writer_prompt = f.read()
-    with open(os.path.join(HERE, "roundup-review-prompt.md")) as f:
-        review_prompt = f.read()
     data = (f"Trading date: {day:%A %d %B %Y} (New York).\n"
             f"Tracker data at the close (the only source for prices):\n{json.dumps(stocks, indent=2)}")
+    return reviewed("roundup", data, check_post(stocks), f"{day:%A %d %B %Y}")
+
+
+def reviewed(kind, data, check, heading):
+    """Writer drafts from <kind>-prompt.md, the other provider fact-checks with <kind>-review-prompt.md,
+    the writer answers each point and revises. Returns (text or "SKIP", footer credit, review notes
+    markdown); text is None if nobody could write (the notes are then the failure log)."""
+    with open(os.path.join(HERE, f"{kind}-prompt.md")) as f:
+        writer_prompt = f.read()
+    with open(os.path.join(HERE, f"{kind}-review-prompt.md")) as f:
+        review_prompt = f.read()
     down, log = set(), []
 
-    writer, draft = attempt(PROVIDERS, "write the post", writer_prompt, data, check_post(stocks), down, log)
+    writer, draft = attempt(PROVIDERS, "write the post", writer_prompt, data, check, down, log)
     if writer is None:
         return None, None, log
     if draft == "SKIP":
@@ -225,7 +231,7 @@ def write_post(day, stocks):
                                    "and give a source in Sources for anything new. Keep every rule and the structure. "
                                    "Output the full revised post, then a line `===RESPONSES===`, then one line per "
                                    "finding: `N. Accepted: <what you changed>` or `N. Rejected: <why>`.",
-                                   check_revision(stocks), down, log)
+                                   check_revision(check), down, log)
         if reviser:
             post, responses = revised
     name = str.title
@@ -238,7 +244,7 @@ def write_post(day, stocks):
         credit = f"Written by {name(writer)}, fact-checked by {name(reviewer)}"
         credit += " (self-review: the other provider was unavailable)" if reviewer == writer else ""
         credit += f", revised by {name(reviser)}." if responses else ". No issues found."
-    notes = [f"# Review notes: {day:%A %d %B %Y}", "", credit]
+    notes = [f"# Review notes: {heading}", "", credit]
     if log:
         notes += ["", "## What went wrong", ""] + [f"- {line}" for line in log]
     if review:

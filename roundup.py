@@ -257,6 +257,7 @@ def reviewed(kind, data, check, heading):
 PAGE = """<!doctype html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="script-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
 <title>{title}</title>
 <style>
 :root {{ --bg: #fbfaf7; --fg: #1d1d1b; --dim: #6b6a65; --rule: #e2dfd6; --link: #1f5fbf; }}
@@ -280,9 +281,13 @@ li {{ margin: .3rem 0; }}
 
 
 def to_html(text, *extensions):
+    # The text is model output built from web pages, served next to the ntfy server: never let it be HTML.
+    # Escaping < turns any tag into text (markdown syntax doesn't need it); the page's CSP blocks scripts too.
+    text = text.replace("&", "&amp;").replace("<", "&lt;")
     # Python-Markdown only starts a list after a blank line; models write "**Sources:**" then "- ..." directly.
     text = re.sub(r"(?m)^((?:> )?)(?![ \t]*(?:[-*] |\d+\. )).*\S.*\n(?=\1(?:[-*] |\d+\. ))", r"\g<0>\1\n", text)
-    return markdown.markdown(text, extensions=["tables", *extensions])
+    out = markdown.markdown(text, extensions=["tables", *extensions])
+    return re.sub(r'(href|src)="(?!https?://)[^"]*:[^"]*"', r'\1="#"', out)  # only web links and relative paths
 
 
 def render(path, title, body, nav):

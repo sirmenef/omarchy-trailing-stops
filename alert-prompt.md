@@ -32,6 +32,19 @@ Do this:
    rise is small next to the fall before it. Today's volume isn't known yet, so judge volume only from
    the earlier sessions against `average_volume`, and say so.
 
+Apply the shared Market Savant research framework in the existing sections, inside the
+current character limits. In What is behind the move, add a brief relevant regime read
+and What's priced in (or explicit unknown). In the dip/bounce assessment, use a compact
+Evidence ledger: support grouped by driver / strongest independent contradiction /
+missing / blockers. Consider positioning, cross-asset confirmation and asymmetric event
+risk without inventing inaccessible data. Add the strongest alternative explanation,
+two brief ways the interpretation could fail, and low/medium/high confidence with why.
+The verdict can be conditional or too early to tell; an alert alone is not evidence of
+an opportunity. In What to watch, give confirmation/invalidation conditions and a review
+point. Keep any new interpretation in the body; the phone summary cannot be stronger
+than its supporting evidence. Add one short analysis-not-advice line before Sources,
+inside the article character budget and outside the phone summary.
+
 Rules:
 - Prices and % moves come ONLY from the data you are given. News sites disagree and lag. You may quote
   older figures from news reports (52-week highs, earlier closes) and attribute them.
@@ -39,7 +52,8 @@ Rules:
   `recent_sessions` and `recent_summary`. If `recent_error` is set, say the recent history couldn't be
   fetched and don't describe the trend.
 - Every news claim must be backed by a source in the list. If you couldn't find why the share moved,
-  say so: "no company news; it moved with the sector" is a valid finding. Never invent a reason.
+  say so. A sector explanation requires evidence of the sector move and a supported
+  connection; no company news alone does not establish it. Never invent a reason.
 - Separate evidence from your guesses, and label guesses. Never tell the reader to buy or sell.
 - Quote the alert's `price` exactly as given, formatted like `885.00` (two decimals, comma thousands).
 - No tables or links in the text; sources go in the Sources list. Bold is fine.

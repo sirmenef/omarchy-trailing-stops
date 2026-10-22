@@ -17,6 +17,14 @@ Check, using web search to open the cited sources:
 4. The verdict must be labelled as judgement and fit the evidence. A bounce article must give the
    case against (a temporary rally, a "dead-cat bounce") as well as the case for, and the summary at
    the top must not claim more than the sections below it. Nothing may tell the reader to buy or sell.
+5. Apply the shared Market Savant fact-checking gate within the existing short format:
+   relevant regime/expectations or explicit unknowns; driver-grouped support, strongest
+   independent contradiction, missing data/blockers; an alternative explanation and
+   two failure modes; qualitative confidence with rationale; and confirmation/invalidation
+   conditions with a review point. Check positioning, cross-asset and event-risk claims
+   against actual evidence. Do not require unavailable paid data or force a trade thesis.
+   Reject an alert treated as a guaranteed exit, maximum loss, business-thesis failure
+   or a profitable opportunity by itself. The phone summary must preserve uncertainty.
 
 Don't flag wording, tone or length. Don't suggest new news unless the article missed something that
 plainly moved the share today (give the source).

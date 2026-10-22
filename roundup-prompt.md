@@ -20,6 +20,28 @@ window, how far the close is from each, the change over the window and the avera
    - the not-advice footer;
    - a "Sources:" list of every URL you relied on.
 
+Apply the shared Market Savant research framework within these sections, keeping the
+500–800 word aim. In What moved them, give a short relevant regime read with dated
+evidence or unknown dimensions. In What can be inferred, give each share a compact
+What's priced in assessment and Evidence ledger (support by driver / independent
+contradiction / missing / blockers). Consider positioning, cross-asset confirmation
+and event risk, explicitly marking unavailable inputs. Add a Conditional outlook with
+confidence and why, the strongest alternative and two brief failure modes. Do not force
+a variant view when consensus or a catalyst is unverified. In What to watch, give
+confirmation/invalidation conditions and a review point per share.
+
+If an earlier opening briefing is supplied, use one short passage in What can be inferred
+to revisit its conditional outlook against today's tracker data and sourced developments:
+supported, contradicted or unresolved, and why. Preserve the distinction between what
+was knowable pre-open and what became known later. A closing snapshot cannot establish
+an intraday trigger was reached; only judge a condition if the supplied evidence can
+resolve it. Do not score confidence as a forecast probability or imply causal proof.
+If the briefing is marked DELAYED or was prepared after the open, label it a reconstructed
+pre-open view, not a forecast recorded before trading; do not claim prospective accuracy.
+If no opening briefing is supplied, say that comparison is unavailable; do not invent it.
+Earlier model commentary is not evidence of a market fact. The example below shows
+format only; none of its figures, dates or claims are reusable research evidence.
+
 Rules:
 - Prices and % moves come ONLY from the tracker data. News sites disagree with each other and lag.
   Never quote a different price for the trading date. You may quote past figures from articles (52-week
@@ -28,7 +50,8 @@ Rules:
   `recent_sessions` and `recent_summary`, not from articles. Use articles only for anything older.
   If `recent_error` is set, say the recent history couldn't be fetched and don't describe the trend.
 - Every factual news claim must be backed by a source in the list. If you couldn't find why a share
-  moved, say so plainly: "no company news; it moved with the sector" is a valid finding. Never invent
+  moved, say so plainly. A sector explanation requires evidence of the sector move and a
+  supported connection; no company news alone does not establish it. Never invent
   a reason. If sources disagree, say they disagree.
 - "What can be inferred" is reasoning, not advice. Separate what the evidence shows from what you are
   guessing, and say which is which. Never tell the reader to buy or sell.
@@ -98,9 +121,7 @@ that consistently, a big part of any one share's move is simply "being a chip st
 At a Shanghai event over the weekend, Chinese DRAM maker ChangXin Memory (CXMT) reported "key
 progress" on a denser memory-cell design (a "4F²" architecture). It plans products by year-end and
 wants to move into high-bandwidth memory (HBM), the premium AI chip memory that has driven Micron's
-record profits. The fear is that cheap Chinese supply erodes memory prices. Elon Musk added fuel:
-when China masters making something, he wrote, it tends to out-scale everyone, and standard memory
-like LPDDR5/6 looks like something China is solving fast.
+record profits. The fear is that cheap Chinese supply erodes memory prices.
 
 **3. Micron's own extra problems.** Netlist has asked the US International Trade Commission to bar
 imports of Micron's HBM3E/HBM4 chips over patent claims. A separate ITC probe covers Micron's DDR5
@@ -145,7 +166,6 @@ the reports below, which don't always agree with each other.*
 **Sources:**
 - [Benzinga: Nasdaq 100 drops 1% on hot CPI, SOXX falls 7th day](https://www.benzinga.com/markets/equities/26/10/62360140/nasdaq-100-drops-1-on-hot-cpi-soxx-falls-7th-day-stock-market-today)
 - [CNBC: Stock market today](https://www.cnbc.com/2026/10/13/stock-market-today-live-updates-.html)
-- [Yahoo Finance: Elon Musk on why chip stocks are getting drilled on news out of China](https://finance.yahoo.com/markets/stocks/article/elon-musk-just-nailed-it-on-why-chip-stocks-like-micron-and-sandisk-are-being-drilled-on-surprising-news-out-of-china-090447539.html)
 - [Motley Fool: Why SanDisk stock dropped again on Tuesday](https://www.fool.com/investing/2026/10/13/why-sandisk-stock-dropped-again-on-tuesday/)
 - [Timothy Sykes: Micron slumps as legal and China DRAM threats mount](https://www.timothysykes.com/news/micron-technology-inc-mu-news-2026_10_14/)
 - [CNBC: Micron sinks, other memory-linked names dip for a second day](https://www.cnbc.com/2026/10/13/sk-hynix-softbank-samsung-electronics-shares-tech-stocks-fall.html)

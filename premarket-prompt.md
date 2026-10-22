@@ -37,6 +37,8 @@ Regional market coverage:
 - Market context: synthesize whether regional signals are supportive, adverse or mixed
   for the US open. Include US futures, rates, currencies or commodities only when sourced
   and relevant to explaining the subscribed shares. Separate observations from inference.
+  Apply the Market Savant research framework: give a compact, evidence-based regime
+  read here; mark unsupported growth/inflation, liquidity or volatility dimensions unknown.
 
 For each share cover:
 - Activity: a premarket price, percentage versus the prior regular-session close, and
@@ -71,6 +73,16 @@ For each share cover:
 - Interpretation: connect news and price action cautiously; label inference explicitly.
   Provide useful events/levels to watch without inventing targets or issuing buy/sell
   instructions. For non-US listings explain that this US session may not apply.
+- Within each existing SYMBOL section, include compact labelled items for What's priced
+  in, Evidence ledger (support by driver / independent contradiction / missing / blockers),
+  and Conditional outlook. Consider positioning, cross-asset confirmation and asymmetric
+  event risk; unknown inputs stay explicit. Include the strongest alternative explanation
+  and two failure modes. Use a variant interpretation only if expectations, evidence and
+  a catalyst/mechanism are supported. Otherwise state insufficient evidence for one.
+  Fold these into the regional impact assessment to avoid repeating the same evidence.
+- Under What to watch at the open, give confirmation/invalidation conditions and a
+  review point for each share. Keep conditions within this report's pre-open horizon.
+  Add one short analysis-not-advice line before Sources, outside the phone summary.
 
 Use only information available before 09:30 New York on session_date and never later
 than the actual current research time. Do not imply the report is a real-time feed.

@@ -235,6 +235,38 @@ python3 ~/.config/omarchy/plugins/io.github.sirmenef.trailing-stops/premarket.py
 systemctl --user disable --now share-premarket.timer
 ```
 
+## Market Savant research framework
+
+Premarket briefings, daily roundups and dip/bounce analyses use a research adaptation
+of **Market Savant v2.1.0**, supplied by the user. The shared
+[`market-savant-research.md`](market-savant-research.md) is loaded automatically for
+the writer, fact-checker and reviser; no separate skill installation is needed.
+
+Within each report's existing format, it adds:
+
+- a relevant market regime and an assessment of what expectations are already priced;
+- an evidence ledger per share: support grouped by driver, independent counter-evidence,
+  material missing data and blockers to a firm interpretation;
+- checks on positioning, cross-asset signals and event risk, with unavailable data explicit;
+- a conditional outlook, confidence with reasons, alternative explanation, failure modes,
+  confirmation/invalidation conditions and a review point.
+
+Daily roundups also receive the saved opening briefing for the same session, when
+available, and revisit its outlook using closing tracker data and verified news. Conditions
+that cannot be resolved from that evidence remain unresolved. Earlier AI commentary
+is not treated as a source of market facts or hindsight evidence for the morning view.
+Briefings prepared after the open are identified as reconstructed views rather than
+forecasts recorded before trading, so the comparison does not claim prospective accuracy.
+
+This is an analysis-only adaptation. Subscriptions do not establish holdings or capital;
+the plugin does not size positions, produce trade cards or change alert rules from the
+research. Tracker price/history authority and the premarket evidence cutoff still apply.
+X/Twitter research is disabled for all three report types. Missing consensus, positioning
+or other paid-data metrics lead to a conditional assessment rather than invented numbers.
+The full skill's sizing script, trade-construction workflow and forecast-scoring journal
+are not included. Research quality depends on source availability and the AI review;
+the existing explicit warning when no fact-checker is available still applies.
+
 ## Where things are stored
 
 | Path | What |

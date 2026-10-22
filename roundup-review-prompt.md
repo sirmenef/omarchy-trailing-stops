@@ -20,6 +20,18 @@ Check, using web search to open the cited sources:
    section if it is missing for a ticker whose Buy bounce status is `triggered`, or present otherwise.
 5. Alerts: the table may only show alerts whose `fired_today_at` is set, with that time. An alert level
    must never be presented as the day's high or low.
+6. Apply the shared Market Savant fact-checking gate. Check a relevant regime read and,
+   for each share, expectations, driver-grouped support, independent counter-evidence,
+   missing data/blockers, conditional outlook, confidence with rationale, two failure
+   modes and confirmation/invalidation conditions with a review point. Unknown data
+   is acceptable; unsupported consensus, flow/crowding, causation and certainty are not.
+7. If an opening briefing is supplied, check the daily comparison resolves only conditions
+   supported by tracker data or independently verified reporting. Closing data alone
+   cannot resolve intraday conditions. Do not let later information rewrite the earlier
+   outlook. Earlier AI commentary is not a source of market facts, and confidence is
+   not a forecast probability. If absent, comparison must be marked unavailable.
+   A DELAYED briefing prepared after the open is a reconstructed pre-open view, not a
+   prospectively recorded forecast; flag claims of forecast accuracy based on it.
 
 Don't flag wording, tone or length. Don't suggest new news unless the post missed something that
 plainly moved a share that day (give the source).

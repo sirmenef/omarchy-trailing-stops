@@ -83,9 +83,48 @@ To turn phone alerts off, clear the **Phone** field and press Enter.
 
 **Private alternative:** to keep your alerts off a public server, host ntfy yourself (see
 [ntfy's self-hosting docs](https://docs.ntfy.sh/install/)) and paste your own server's topic URL
-instead. If your server is only reachable on a private network such as a VPN, your phone needs to be
-on that network too. On iOS, instant delivery from a self-hosted server also needs `upstream-base-url`
-set; the ntfy docs explain it.
+instead. For private phone access on Omarchy, use its built-in Tailscale integration as
+described below. On iOS, instant delivery from a self-hosted server also needs
+`upstream-base-url: "https://ntfy.sh"`; see [ntfy's configuration guide](https://docs.ntfy.sh/config/).
+
+### Private access with Omarchy and Tailscale
+
+Omarchy has first-class Tailscale support, including setup and a bar widget. If you have
+already connected this computer, use that connection. Otherwise, choose **Install →
+Service → Tailscale** in the Omarchy menu, or run its built-in installer:
+
+```bash
+omarchy install service tailscale
+```
+
+Follow the sign-in link shown by the installer. It starts the Tailscale service and adds
+the bar integration. Then:
+
+1. Install the Tailscale app on your phone and sign in to the **same tailnet** as this
+   computer. Using the same account is the simplest setup; another account must have
+   access to that tailnet. The devices do not need to share Wi-Fi: mobile data works too.
+2. Keep Tailscale connected on both devices. Any tailnet access rules must allow the
+   phone to reach the computer's HTTPS service. The computer must be awake, online,
+   and running ntfy and report hosting when the phone needs those services.
+3. Configure your self-hosted ntfy service and expose it privately using
+   [Tailscale Serve](https://tailscale.com/docs/reference/examples/serve). Omarchy's
+   Tailscale integration supplies the network connection; it does not install ntfy or
+   configure report hosting for this plugin.
+4. In the ntfy phone app, subscribe to your own server and topic, for example
+   `https://your-machine.your-tailnet.ts.net/<your-topic>`. Enter the same full topic URL
+   in the plugin's **Phone** field. Use your own machine's address, not another user's.
+5. Serve the report folder and set `roundup_url` as described in [Daily roundup](#daily-roundup-optional-extra-setup).
+   The report URL and ntfy topic URL are different: `/roundups/` contains articles;
+   `/<your-topic>` carries notifications.
+6. With Tailscale connected on the phone, open the report index in its browser, press
+   **Test** in the plugin, and tap a subsequent report notification to check its article
+   opens. Testing over mobile data also confirms access away from your home network.
+
+On iOS, the ntfy upstream relay wakes the app, which then fetches the actual message
+from your server. Tailscale must still provide access to that server. If the phone
+cannot reach it, you may see a generic "New message" or fail to load the content. The
+same private connection is needed to open report links. Public `ntfy.sh` notifications
+do not require Tailscale, but report links hosted privately with Serve still do.
 
 ## Daily roundup (optional extra setup)
 
@@ -130,11 +169,13 @@ systemctl --user enable --now share-roundup.timer
 To write one straight away (after the US close), run
 `python3 ~/.config/omarchy/plugins/io.github.sirmenef.trailing-stops/roundup.py`.
 
-**Read the posts:** open `~/.local/share/trailing-stops/roundups/index.html` in a browser. It lists both
-kinds of article; `daily/` lists only the daily roundups and `alerts/` only the alert analyses. If phone
-alerts are set up, each post is announced on your phone too, along with a failure notice if no agent
+**Read the posts:** open `~/.local/share/trailing-stops/roundups/index.html` in a browser. It lists all
+three report types; `daily/` lists daily roundups, `alerts/` alert analyses and `premarket/`
+opening briefings. If phone alerts are set up, each post is announced on your phone too,
+along with a failure notice if no agent
 could write it. To make tapping that notification open the post, serve the folder somewhere your phone
-can reach, for example with `tailscale serve`. Then add its address to
+can reach, for example with Tailscale Serve over [Omarchy's Tailscale connection](#private-access-with-omarchy-and-tailscale).
+Then add its address to
 `~/.config/omarchy/trailing-stops.json`:
 
 ```json
@@ -266,6 +307,66 @@ or other paid-data metrics lead to a conditional assessment rather than invented
 The full skill's sizing script, trade-construction workflow and forecast-scoring journal
 are not included. Research quality depends on source availability and the AI review;
 the existing explicit warning when no fact-checker is available still applies.
+
+## Customise your report prompts
+
+The prompts are plain Markdown files inside
+`~/.config/omarchy/plugins/io.github.sirmenef.trailing-stops/`. Open them in your
+preferred text editor to change the writing style, language, explanations or emphasis.
+
+| Report | Writer prompt | Fact-checker prompt |
+|---|---|---|
+| Opening briefing | [`premarket-prompt.md`](premarket-prompt.md) | [`premarket-review-prompt.md`](premarket-review-prompt.md) |
+| Daily roundup | [`roundup-prompt.md`](roundup-prompt.md) | [`roundup-review-prompt.md`](roundup-review-prompt.md) |
+| Buy dip / Buy bounce | [`alert-prompt.md`](alert-prompt.md) | [`alert-review-prompt.md`](alert-review-prompt.md) |
+
+Start with the writer prompt for the report you want to change. For example, add:
+
+> Write in British English for a nonprofessional investor. Explain acronyms, use short
+> paragraphs, and focus the explanation on earnings, supply-chain developments and
+> regional market risks. Keep the required sections, source rules and phone-summary limits.
+
+The shared [`market-savant-research.md`](market-savant-research.md) is appended to both
+writer and fact-checker instructions, including revisions. Change it if you want to
+adjust the common research approach across all three report types. To customise only
+one report's voice, edit its writer prompt instead. Keep preferences consistent with
+the required format and shared framework; Python checks still validate the output.
+
+Keep the output contract intact:
+
+- Preserve each report's required headings and title/source format, and the holiday
+  `SKIP` response for opening/daily reports.
+  Opening reports require Market context, Asian markets, European markets, an exact
+  heading for every subscribed symbol, What to watch at the open, Data limitations
+  and Sources. Dip/bounce reports need their `##` sections so the phone summary can
+  be separated from the article.
+- Keep alert summaries under 500 characters and the generated alert article before
+  Sources under 3,500 characters. The script adds its own trigger explanation afterward.
+- Retain source/timestamp requirements, explicit uncertainty, tracker price/history
+  authority for daily/alert reports, the pre-open evidence cutoff, and disabled X research.
+- For style-only changes, the fact-checker can stay as it is. If you change content
+  requirements, align the corresponding reviewer prompt so it checks the same contract.
+
+Back up your edits **outside the plugin directory** before updating:
+
+```bash
+prompt_backup_dir="$HOME/.local/share/trailing-stops/prompt-backups/$(date +%Y%m%d-%H%M%S)"
+mkdir -p "$prompt_backup_dir"
+cp ~/.config/omarchy/plugins/io.github.sirmenef.trailing-stops/*prompt.md \
+   ~/.config/omarchy/plugins/io.github.sirmenef.trailing-stops/market-savant-research.md \
+   "$prompt_backup_dir/"
+```
+
+There is currently no separate user-override prompt folder. Direct edits are local Git
+changes and can prevent `omarchy plugin update` from fast-forwarding. Keep your backup,
+compare your edits with new upstream prompts, and resolve local changes before updating;
+then reapply compatible preferences. Preserve new upstream research rules when merging.
+
+Prompts are read on every new generation, so no service restart is needed. Review the
+next newly generated article and its review notes to check the result. Existing articles
+are not rewritten when you save a prompt, and rerunning a completed premarket report
+reuses its saved article. A failed output check may cause provider fallback or generation
+failure; restore your backup if your edit broke the required format.
 
 ## Where things are stored
 

@@ -296,7 +296,7 @@ def render(path, title, body, nav):
 
 
 def rebuild_index(root):
-    """Three lists: daily/ (the roundups), alerts/ (the dip/bounce analyses) and both on the base page."""
+    """Daily roundups, alert analyses and premarket reports, plus the combined base page."""
     def items(folder, pattern, href):
         out = []
         for name in sorted(os.listdir(folder), reverse=True) if os.path.isdir(folder) else []:
@@ -310,14 +310,20 @@ def rebuild_index(root):
     adir, home = os.path.join(root, "alerts"), '<a href="../">← share roundups</a>'
     os.makedirs(os.path.join(root, "daily"), exist_ok=True)
     os.makedirs(adir, exist_ok=True)
+    pdir = os.path.join(root, "premarket")
+    os.makedirs(pdir, exist_ok=True)
     render(os.path.join(root, "index.html"), "Share roundups",
            '<h1>Share roundups</h1>\n<h2><a href="daily/">Daily roundups</a></h2>\n' + items(root, daily, "")
-           + '\n<h2><a href="alerts/">Buy dip and Buy bounce analyses</a></h2>\n' + items(adir, alerts, "alerts/"),
+           + '\n<h2><a href="alerts/">Buy dip and Buy bounce analyses</a></h2>\n' + items(adir, alerts, "alerts/")
+           + '\n<h2><a href="premarket/">Premarket reports</a></h2>\n' + items(pdir, daily, "premarket/"),
            "")
     render(os.path.join(root, "daily", "index.html"), "Daily roundups",
            "<h1>Daily roundups</h1>\n" + items(root, daily, "../"), home)
     render(os.path.join(adir, "index.html"), "Buy dip and Buy bounce analyses",
            "<h1>Buy dip and Buy bounce analyses</h1>\n" + items(adir, alerts, ""), home)
+
+    render(os.path.join(pdir, "index.html"), "Premarket reports",
+           "<h1>Premarket reports</h1>\n" + items(pdir, daily, ""), home)
 
 
 def main():

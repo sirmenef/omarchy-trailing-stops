@@ -178,6 +178,63 @@ credit, and it sends the ticker and prices to the provider.
 
 If an analysis fails, the push says so. The log is `~/.local/state/trailing-stops/alert-analysis.log`.
 
+## Premarket briefing
+
+`premarket.py` reads your current tracker subscriptions and researches each share before
+US regular trading opens. The weekday timer starts at **08:30 America/New_York**,
+following US daylight saving time. Generation takes several minutes, so delivery is
+not guaranteed at exactly 08:30. Missed schedules are caught up when your user session
+starts; pending work is checked **20 minutes after each attempt finishes**, including
+failures. A failure never causes overlapping runs. Once complete, later checks do no
+research and send no duplicate push. Research checks the exchange holiday calendar;
+closed sessions are marked complete without an article.
+
+Pending session dates survive shutdown. Generation failures retry research; delivery
+failures reuse the saved article. Delays past the open or into another day are clearly
+labelled **DELAYED**, and research stays bounded to the original session's pre-open
+cutoff. The computer must be running with your user session active to retry; it cannot
+send reports while powered off. A saved pending session is finished first; the next
+check catches up the latest due weekday (missed days without a pending record are not
+all backfilled). There is no retry count limit.
+
+Reports include sourced, timestamped premarket price/volume where available,
+overnight market/company news, and what to watch at the open. Separate **Asian markets**
+and **European markets** sections cover major benchmarks, relevant sectors and economic
+developments. Asian session closes and European trading so far are dated and sourced;
+holidays, stale observations and unavailable data are labelled explicitly.
+
+For each subscribed share, the report assesses how these developments could affect it
+through demand, suppliers, competitors, currencies, rates or other supported exposures.
+These assessments are labelled as inference, with direction, confidence, counter-evidence
+and what would confirm or weaken the interpretation. An unsupported link stays unclear.
+Research uses publicly accessible news, company announcements, filings and market,
+economic and industry reports. **X/Twitter research is disabled**, including public-post
+searches, trends and social sentiment. No X API or paid market feed is required.
+Unverifiable quotes and unsupported activity comparisons are marked unavailable. All
+regional observations and news must respect the report's pre-open information cutoff.
+
+The existing Claude/Codex research, fact-check and revision pipeline writes each
+briefing. Its existing provider fallback applies, including an explicit warning in
+the article if fact-checking is unavailable. The same CLI login, Python Markdown,
+provider usage charges and phone configuration as the daily roundup apply. Only
+subscriptions are read; the briefing does not poll or change trailing alert state.
+
+Articles and review notes are saved as Markdown and HTML under
+`<roundup_dir>/premarket/`, with a separate index linked from the roundup home page.
+The existing phone push sends the summary and a link when `roundup_url` is configured.
+An existing dated report is reused on reruns, and a failed push can be retried without
+regenerating the report (delivery after a network timeout can occasionally duplicate).
+
+```bash
+cp ~/.config/omarchy/plugins/io.github.sirmenef.trailing-stops/share-premarket.{service,timer} ~/.config/systemd/user/
+systemctl --user daemon-reload
+systemctl --user enable --now share-premarket.timer
+# Manual run, during the premarket window:
+python3 ~/.config/omarchy/plugins/io.github.sirmenef.trailing-stops/premarket.py
+# Disable:
+systemctl --user disable --now share-premarket.timer
+```
+
 ## Where things are stored
 
 | Path | What |

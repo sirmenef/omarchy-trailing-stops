@@ -1,0 +1,13 @@
+[Unit]
+Description=Weekday share briefing before the US open
+
+[Timer]
+OnCalendar=Mon..Fri 08:30 America/New_York
+# Catch up at startup; poll pending work 20 minutes after each attempt ends.
+OnStartupSec=2min
+OnUnitInactiveSec=20min
+Persistent=true
+AccuracySec=1s
+
+[Install]
+WantedBy=timers.target

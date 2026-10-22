@@ -1,0 +1,9 @@
+[Unit]
+Description=Premarket briefing for subscribed tracker shares
+After=network-online.target
+
+[Service]
+Type=oneshot
+Environment=PYTHONDONTWRITEBYTECODE=1
+ExecStart=/usr/bin/python3 %h/.config/omarchy/plugins/io.github.sirmenef.trailing-stops/premarket.py
+TimeoutStartSec=55min

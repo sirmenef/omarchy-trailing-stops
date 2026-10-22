@@ -1,5 +1,7 @@
 # Trailing Stops for Omarchy
 
+Version **1.0.0**, the first public release. See [release notes](CHANGELOG.md).
+
 A bar widget that watches share prices and tells you when to look at buying or selling. Each ticker
 can run three alerts, each with its own percentage:
 
@@ -393,13 +395,13 @@ python3 tracker.py test            # send a test push
 
 ## Remove
 
-If you turned on the daily roundup, remove its timer first:
+If you enabled either scheduled report, disable both report timers and remove their
+copied units before removing the plugin:
 
 ```bash
-systemctl --user disable --now share-roundup.timer
-rm -f ~/.config/systemd/user/share-roundup.{service,timer}
+systemctl --user disable --now share-roundup.timer share-premarket.timer
+rm -f ~/.config/systemd/user/share-roundup.{service,timer} ~/.config/systemd/user/share-premarket.{service,timer}
 systemctl --user daemon-reload
-rm -rf ~/.local/share/trailing-stops   # deletes the posts too
 ```
 
 Then remove the plugin and its settings:
@@ -410,7 +412,25 @@ rm -f ~/.config/omarchy/trailing-stops.json
 rm -rf ~/.local/state/trailing-stops
 ```
 
+Reports are retained. To delete them too, remove `~/.local/share/trailing-stops/roundups/`
+or your configured `roundup_dir` after saving anything you want to keep. Prompt backups
+under `~/.local/share/trailing-stops/prompt-backups/` are retained separately.
+
 If you set up phone alerts, also unsubscribe from the topic in the ntfy app.
+Any self-hosted ntfy service or Tailscale Serve routes you configured are independent;
+remove those separately only if other applications do not use them.
+
+## Development checks
+
+With the report dependency `python-markdown` installed, run these from the repository root:
+
+```bash
+omarchy plugin validate .
+PYTHONDONTWRITEBYTECODE=1 python3 -m unittest -v test_premarket.py test_research_framework.py
+```
+
+The automated tests isolate configuration and use mocked research providers and push
+delivery. They do not spend AI credit or send real phone notifications.
 
 ## License
 
